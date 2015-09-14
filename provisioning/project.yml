@@ -1,0 +1,29 @@
+- hosts: web_servers
+  sudo: True
+  vars:
+    name: project
+    postgres_config:
+      app_db: "test"
+      app_user: "test"
+      app_password: "test"
+
+  roles:
+    - python
+    - docker
+
+  tasks:
+
+    - name: "Create project dirs"
+      file: path="/home/{{ ohai_current_user }}/apps/{{ name }}" state="directory" group="{{ ohai_current_user }}" owner="{{ ohai_current_user }}"
+      tags:
+        - setup
+
+    - name: "Create project dirs"
+      file: path="/home/{{ ohai_current_user }}/apps/{{ name }}/{{ item }}" state="directory" group="{{ ohai_current_user }}" owner="{{ ohai_current_user }}"
+      with_items:
+        - build
+        - logs
+        - data/upload
+        - data/static
+      tags:
+        - setup

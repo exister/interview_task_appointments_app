@@ -1,0 +1,19 @@
+[run]
+omit =
+    */migrations/*
+    */fixtures/*
+    */initial_data.py
+    */test_*.py
+    */management/commands/*.py
+    project/settings/local.py
+    project/settings/production.py
+    project/wsgi.py
+    manage.py
+
+[report]
+exclude_lines =
+    def __repr__
+    def __unicode__
+    raise NotImplementedError
+    raise ImproperlyConfigured
+    if settings.DEBUG
