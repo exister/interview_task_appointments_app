@@ -7,6 +7,8 @@ urlpatterns_pages = patterns('core.views.pages',
 
 urlpatterns_ajax = patterns('core.views.ajax',
     url('^doctors/$', 'doctors_list', name='doctors_list'),
+    url('^dates/$', 'dates_list', name='dates_list'),
+    url('^times/$', 'times_list', name='times_list'),
 )
 
 

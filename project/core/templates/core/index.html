@@ -57,7 +57,7 @@
 
         <input type="text" id="input_middle_name" class="form-control" name="middle_name" placeholder="Отчество" required autofocus>
 
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Записаться</button>
+        <button class="btn btn-lg btn-primary btn-block" id="form-appointment-submit" type="submit" disabled>Записаться</button>
     </form>
 
 </div>
@@ -82,7 +82,6 @@
                         .html(html)
                         .removeAttr('disabled')
                         .on('change', function (e) {
-                                console.log(e);
                             loadDates(doctor.val());
                         });
                 })
@@ -92,22 +91,57 @@
         }
 
         function loadDates (doctor_id) {
-            var dates = $('#form-appointment-date');
+            var date = $('#form-appointment-date');
+            var time = $('#form-appointment-time');
 
-            if (doctor_id < 0) {
-                dates.attr('disabled', true);
-            }
-            else {
-                dates.removeAttr('disabled');
-            }
+            date.prop( "disabled", doctor_id == '-1');
+            time.prop( "disabled", true);
+            $('#form-appointment-submit').prop( "disabled", true);
 
-            $.getJSON('/dates/')
+            if (doctor_id != '-1') {
+                $.getJSON('/dates/')
+                    .done(function (data) {
+                        var html = '<option value="-1">Выберите дату</option>';
+                        $.each(data['dates'], function(i, d) {
+                            html += '<option value="' + d.date + '">' + d.date + '</option>';
+                        });
+                        date
+                            .html(html)
+                            .removeAttr('disabled')
+                            .on('change', function (e) {
+                                loadTimes(doctor_id, date.val());
+                            });
+                    })
+                    .fail(function () {
+
+                    })
+            }
+        }
+
+        function loadTimes (doctor_id, date) {
+            var time = $('#form-appointment-time');
+
+            time.prop( "disabled", date == '-1');
+            $('#form-appointment-submit').prop( "disabled", true);
+
+            if (date != '-1') {
+                $.getJSON('/times/?doctor=' + doctor_id + '&date=' + date)
                 .done(function (data) {
-
+                    var html = '<option value="-1">Выберите время</option>';
+                    $.each(data['times'], function(i, d) {
+                        html += '<option value="' + d.time + '">' + d.time + '</option>';
+                    });
+                    time
+                        .html(html)
+                        .removeAttr('disabled')
+                        .on('change', function (e) {
+                            $('#form-appointment-submit').prop( "disabled", time.val() == '-1');
+                        });
                 })
                 .fail(function () {
 
                 })
+           }
         }
 
         loadDoctors();
