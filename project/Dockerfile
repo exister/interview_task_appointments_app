@@ -9,4 +9,10 @@ ENV LC_ALL ru_RU.UTF-8
 
 WORKDIR /app
 EXPOSE 8000
-CMD ["/usr/bin/uwsgi", "--plugin=python", "--ini", "/app/uwsgi.ini"]
+RUN mkdir -p /data && \
+     touch /data/.keep && \
+     chown -R django:django /data
+VOLUME ["/data"]
+USER django
+
+CMD ["uwsgi", "--plugin=python", "--ini", "/app/uwsgi.ini"]

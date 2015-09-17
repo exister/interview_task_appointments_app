@@ -2,6 +2,7 @@ import json
 import datetime
 from django import forms
 from django.http import HttpResponse
+from django.utils import timezone
 from django.views.generic import TemplateView
 from ..models import Doctor, Appointment
 
@@ -67,7 +68,7 @@ class TimesList(JsonMixin, TemplateView):
         self.form = TimeListForm(request.GET)
         if not self.form.is_valid():
             return HttpResponse(status=400)
-        return super(TimesList, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def times_range(self, doctor, date):
         existing_appointments = {
@@ -80,7 +81,7 @@ class TimesList(JsonMixin, TemplateView):
                 )
             )
         }
-        start = datetime.datetime.combine(date, datetime.time(9, 0, 0))
+        start = timezone.make_aware(datetime.datetime.combine(date, datetime.time(9, 0, 0)), timezone.utc)
         i = 0
         while i < 9:
             d = start + datetime.timedelta(hours=i)
@@ -92,7 +93,7 @@ class TimesList(JsonMixin, TemplateView):
         context = {
             'times': [
                 {
-                    'time': d.isoformat(),
+                    'time': timezone.make_naive(d, timezone.utc).isoformat(),
                 }
                 for d in self.times_range(**self.form.cleaned_data)
             ]

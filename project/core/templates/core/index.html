@@ -37,6 +37,8 @@
     <form method="post" id="form-appointment" class="form-appointment">
         {% csrf_token %}
 
+        {{ form.errors }}
+
         <h2>Запись на прием</h2>
 
         <select class="form-control" id="form-appointment-doctor" name="doctor" disabled>
@@ -47,15 +49,18 @@
             <option value="-1">Выберите дату</option>
         </select>
 
-        <select class="form-control" id="form-appointment-time" name="time" disabled>
+        <select class="form-control" id="form-appointment-time" name="start" disabled>
             <option value="-1">Выберите время</option>
         </select>
 
-        <input type="text" id="input_last_name" class="form-control" name="first_name" placeholder="Фамилия" required autofocus>
+        <input type="text" id="input_last_name" class="form-control" name="first_name" value="{{ form.last_name.value|default:'' }}"
+               placeholder="Фамилия" required autofocus>
 
-        <input type="text" id="input_first_name" class="form-control" name="last_name" placeholder="Имя" required autofocus>
+        <input type="text" id="input_first_name" class="form-control" name="last_name" value="{{ form.first_name.value|default:'' }}"
+               placeholder="Имя" required autofocus>
 
-        <input type="text" id="input_middle_name" class="form-control" name="middle_name" placeholder="Отчество" required autofocus>
+        <input type="text" id="input_middle_name" class="form-control" name="middle_name" value="{{ form.middle_name.value|default:'' }}"
+               placeholder="Отчество" required autofocus>
 
         <button class="btn btn-lg btn-primary btn-block" id="form-appointment-submit" type="submit" disabled>Записаться</button>
     </form>

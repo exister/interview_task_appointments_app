@@ -2,10 +2,6 @@
   sudo: True
   vars:
     name: project
-    postgres_config:
-      app_db: "test"
-      app_user: "test"
-      app_password: "test"
 
   roles:
     - python
@@ -23,7 +19,86 @@
       with_items:
         - build
         - logs
-        - data/upload
-        - data/static
+        - data
       tags:
         - setup
+
+    - name: "Build base django image"
+      docker_image:
+        path="files/djangoapp"
+        name="base/djangoapp"
+      tags:
+        - setup
+
+    - name: "Build base project image"
+      docker_image:
+        path="files/project"
+        name="base/djangoapp_project"
+      tags:
+        - setup
+
+    - name: "Build project image"
+      docker_image:
+        path="../project"
+        name="djangoapp_project"
+        state="build"
+      tags:
+        - setup
+
+    - name: "Stop app container"
+      docker:
+        image: "djangoapp_project"
+        name: "djangoapp_project_web_server"
+        state: "absent"
+      tags:
+        - setup
+
+    - name: "Data container"
+      docker:
+        image: "djangoapp_project"
+        name: "db"
+        command: "echo db"
+        state: present
+
+    - name: "Migrate"
+      docker:
+        image: "djangoapp_project"
+        name: "djangoapp_project_migrate"
+        volumes_from:
+          - "db"
+        command: "python3 manage.py migrate"
+      tags:
+        - setup
+
+    - name: "wait for migrate"
+      shell: "docker wait djangoapp_project_migrate && docker logs djangoapp_project_migrate && docker rm djangoapp_project_migrate"
+      tags:
+        - setup
+
+    - name: "Static"
+      docker:
+        image: "djangoapp_project"
+        name: "djangoapp_project_static"
+        volumes_from:
+          - "db"
+        command: "python3 manage.py collectstatic --noinput"
+      tags:
+        - setup
+
+    - name: "wait for static"
+      shell: "docker wait djangoapp_project_static && docker logs djangoapp_project_static && docker rm djangoapp_project_static"
+      tags:
+        - setup
+
+    - name: "Start new app container"
+      docker:
+        image: "djangoapp_project"
+        name: "djangoapp_project_web_server"
+        volumes_from:
+          - "db"
+        ports:
+          - 80:8000
+        state: started
+      tags:
+        - setup
+

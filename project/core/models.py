@@ -39,4 +39,7 @@ class Appointment(Timestampable, models.Model):
     patient = models.ForeignKey(Patient)
 
     def __unicode__(self):
-        return '{} {} {}'.format(self.start, self.doctor, self.patient)
+        return '{} doctor {} patient {}'.format(self.start, self.doctor, self.patient)
+
+    def __str__(self):
+        return self.__unicode__()

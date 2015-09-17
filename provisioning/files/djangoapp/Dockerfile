@@ -20,5 +20,3 @@ RUN wget https://bootstrap.pypa.io/ez_setup.py && python3 ez_setup.py && wget ht
 RUN pip3 install uwsgi
 
 RUN groupadd -r django && useradd -r -g django django
-
-USER django

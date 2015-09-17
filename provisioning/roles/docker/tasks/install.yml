@@ -21,3 +21,6 @@
   apt: pkg={{ item }} state=present
   with_items:
     - docker-engine
+
+- name: Install pip packages
+  pip: name=docker-py version=1.4.0 state=present
